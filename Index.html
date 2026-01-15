@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8" />
+<title>Cyberpunk Egg Timer</title>
+<style>
+    body {
+        background: radial-gradient(circle at center, #0a0a0f 0%, #000000 80%);
+        font-family: 'Orbitron', sans-serif;
+        color: #00f6ff;
+        text-align: center;
+        padding-top: 60px;
+        overflow: hidden;
+    }
+
+    h1 {
+        font-size: 3rem;
+        text-shadow: 0 0 15px #00f6ff, 0 0 30px #00f6ff;
+        animation: flicker 2s infinite;
+    }
+
+    @keyframes flicker {
+        0%, 18%, 22%, 25%, 53%, 57%, 100% {
+            opacity: 1;
+        }
+        20%, 24%, 55% {
+            opacity: 0.4;
+        }
+    }
+
+    .timer-display {
+        font-size: 5rem;
+        margin: 30px 0;
+        text-shadow: 0 0 10px #ff0099, 0 0 30px #ff0099;
+    }
+
+    input {
+        padding: 10px;
+        width: 90px;
+        font-size: 1.2rem;
+        background: #111;
+        border: 2px solid #00f6ff;
+        color: #00f6ff;
+        border-radius: 5px;
+        text-align: center;
+        box-shadow: 0 0 10px #00f6ff;
+    }
+
+    button {
+        margin-top: 20px;
+        padding: 15px 30px;
+        font-size: 1.4rem;
+        font-weight: bold;
+        background: linear-gradient(45deg, #ff0099, #00f6ff);
+        border: none;
+        color: #000;
+        border-radius: 8px;
+        cursor: pointer;
+        box-shadow: 0 0 20px #ff0099;
+        transition: 0.2s;
+    }
+
+    button:hover {
+        transform: scale(1.07);
+        box-shadow: 0 0 30px #00f6ff;
+    }
+
+    .alarm-flash {
+        animation: flash 0.2s infinite alternate;
+    }
+
+    @keyframes flash {
+        from {
+            background: #ff0088;
+        }
+        to {
+            background: #00f6ff;
+        }
+    }
+
+</style>
+</head>
+<body>
+<h1>CYBERPUNK EGG TIMER</h1>
+
+<div class="timer-display" id="display">00:00</div>
+
+<label>Minutter: <input type="number" id="minutes" min="0" value="3"></label>
+<br><br>
+
+<button onclick="startTimer()">START</button>
+
+<audio id="alarm-sound">
+    <source src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long
+
+<script>
+let timer;
+let totalSeconds;
+
+function startTimer() {
+    clearInterval(timer);
+
+    const mins = parseInt(document.getElementById('minutes').value) || 0;
+    totalSeconds = mins * 60;
+
+    updateDisplay();
+
+    timer = setInterval(() => {
+        totalSeconds--;
+        updateDisplay();
+
+        if (totalSeconds <= 0) {
+            clearInterval(timer);
+            triggerAlarm();
+        }
+    }, 1000);
+}
+
+function updateDisplay() {
+    const m = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+    const s = String(totalSeconds % 60).padStart(2, '0');
+    document.getElementById("display").textContent = `${m}:${s}`;
+}
+
+function triggerAlarm() {
+    const sound = document.getElementById("alarm-sound");
+    sound.play();
+
+    document.body.classList.add("alarm-flash");
+
+    if (navigator.vibrate) {
+        navigator.vibrate([500, 300, 500, 300, 500]);
+    }
+
+    alert("Tiden er ute – egg ferdig!");
+}
+</script>
+</body>
+</html>
