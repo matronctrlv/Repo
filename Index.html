@@ -1,430 +1,179 @@
 <!DOCTYPE html>
 <html lang="no">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Cyberpunk Egg Timer</title>
+<meta charset="UTF-8">
+<title>CYBER EGG TIMER</title>
 <style>
-    :root{
-        --neon-cyan:#00f6ff;
-        --neon-pink:#ff0099;
-        --bg0:#000000;
-        --bg1:#0a0a0f;
-        --text:#cfefff;
-    }
-    @font-face{
-        font-family: "OrbitronLocal";
-        src: local("Orbitron");
-        font-display: swap;
-    }
-    html,body{
-        height:100%;
-        margin:0;
-        background: radial-gradient(1000px 600px at 50% 30%, var(--bg1) 0%, var(--bg0) 70%);
-        color:var(--text);
-        font-family: "OrbitronLocal", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-        overflow:hidden;
-    }
-    .scanlines::before{
-        content:"";
-        position:fixed; inset:0;
-        background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 1px, transparent 2px, transparent 4px);
-        mix-blend-mode: overlay;
-        pointer-events:none;
-    }
-    .wrap{
-        max-width:720px;
-        margin:0 auto;
-        padding:48px 24px;
-        text-align:center;
-        position:relative;
-    }
-    h1{
-        margin:0 0 12px 0;
-        font-size: clamp(28px, 5vw, 48px);
-        letter-spacing: 2px;
-        color:var(--neon-cyan);
-        text-shadow: 0 0 10px var(--neon-cyan), 0 0 25px var(--neon-cyan);
-        animation: flicker 2.2s infinite;
-    }
-    @keyframes flicker{
-        0%, 18%, 22%, 25%, 53%, 57%, 100%{ opacity:1 }
-        20%, 24%, 55%{ opacity:.45 }
-    }
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
-    .display{
-        font-size: clamp(44px, 12vw, 96px);
-        margin: 12px auto 18px;
-        font-weight: 800;
-        color: var(--neon-pink);
-        text-shadow: 0 0 12px var(--neon-pink), 0 0 36px var(--neon-pink);
-        letter-spacing: .06em;
-        user-select:none;
-    }
+:root {
+  --neon-pink: #ff2fd6;
+  --neon-blue: #00f6ff;
+  --bg-dark: #05010d;
+}
 
-    .inputs{
-        display:flex; gap:12px; justify-content:center; align-items:center; flex-wrap:wrap;
-        margin: 6px 0 8px;
-    }
-    .field{
-        display:flex; flex-direction:column; align-items:center;
-        color:#9feaff;
-        text-shadow: 0 0 10px var(--neon-cyan);
-        font-size:14px;
-    }
-    input[type="number"]{
-        width:96px;
-        padding:10px 12px;
-        font-size:18px;
-        background:#0b0f14;
-        border:2px solid var(--neon-cyan);
-        color:var(--neon-cyan);
-        border-radius:8px;
-        text-align:center;
-        outline:none;
-        box-shadow: 0 0 14px rgba(0,246,255,.35);
-    }
-    input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button{
-        -webkit-appearance: none; margin: 0;
-    }
+* {
+  box-sizing: border-box;
+  font-family: 'Orbitron', sans-serif;
+}
 
-    .buttons{
-        display:flex; gap:12px; justify-content:center; margin-top:12px; flex-wrap:wrap;
-    }
-    .btn{
-        padding:14px 26px;
-        font-size:18px;
-        font-weight:800;
-        border:none;
-        color:#000;
-        background: linear-gradient(45deg, var(--neon-pink), var(--neon-cyan));
-        border-radius:10px;
-        cursor:pointer;
-        box-shadow: 0 0 22px var(--neon-pink), inset 0 0 8px rgba(0,0,0,.35);
-        transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
-        text-transform:uppercase;
-        letter-spacing:.08em;
-    }
-    .btn:hover{ transform: translateY(-2px) scale(1.03); box-shadow: 0 0 30px var(--neon-cyan) }
-    .btn:active{ transform: translateY(0) scale(0.98); filter: brightness(.92) }
-    .btn.secondary{
-        background: linear-gradient(45deg, #8cff00, #00ffa0);
-        box-shadow: 0 0 22px #00ffa0;
-    }
-    .btn.warn{
-        background: linear-gradient(45deg, #ff3b3b, #ff9900);
-        box-shadow: 0 0 22px #ff3b3b;
-        color:#fff;
-    }
+body {
+  margin: 0;
+  height: 100vh;
+  background: radial-gradient(circle at top, #12002a, var(--bg-dark));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--neon-blue);
+}
 
-    .ring{
-        position:absolute;
-        inset:auto 0 0 0;
-        height:8px;
-        background: linear-gradient(90deg, transparent, var(--neon-pink), transparent);
-        filter: blur(8px);
-        opacity:.6;
-    }
+.container {
+  background: rgba(10, 0, 30, 0.9);
+  border: 2px solid var(--neon-pink);
+  box-shadow: 0 0 25px var(--neon-pink);
+  padding: 30px 40px;
+  text-align: center;
+  width: 360px;
+}
 
-    .progress{
-        width: min(520px, 90vw);
-        height: 12px;
-        margin: 18px auto 0;
-        background: rgba(0,246,255,.08);
-        border: 1px solid rgba(0,246,255,.35);
-        border-radius: 999px;
-        box-shadow: inset 0 0 16px rgba(0,246,255,.25);
-        overflow: hidden;
-        position:relative;
-    }
-    .bar{
-        position:absolute; left:0; top:0; bottom:0;
-        width:0%;
-        background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
-        box-shadow: 0 0 20px var(--neon-pink);
-        transition: width .2s linear;
-    }
+h1 {
+  color: var(--neon-pink);
+  text-shadow: 0 0 10px var(--neon-pink);
+  margin-bottom: 20px;
+}
 
-    /* Alarmflash */
-    .alarm-flash{
-        animation: flash .18s infinite alternate;
-    }
-    @keyframes flash{
-        from{ background: #2c0020 }
-        to{   background: #001e24 }
-    }
+.timer {
+  font-size: 64px;
+  letter-spacing: 4px;
+  margin: 20px 0;
+  text-shadow: 0 0 20px var(--neon-blue);
+}
 
-    .hint{
-        margin-top:10px; opacity:.7; font-size:13px
-    }
+input {
+  width: 80px;
+  font-size: 22px;
+  padding: 5px;
+  background: black;
+  color: var(--neon-blue);
+  border: 1px solid var(--neon-blue);
+  text-align: center;
+  box-shadow: 0 0 10px var(--neon-blue);
+}
 
-    /* Small “CRT” border lines */
-    .chrome{
-        position:fixed; inset:18px;
-        border: 1px solid rgba(0,246,255,.25);
-        border-radius: 12px;
-        pointer-events:none;
-        box-shadow: inset 0 0 40px rgba(0,246,255,.08), 0 0 50px rgba(255,0,153,.08);
-    }
+button {
+  margin: 10px;
+  padding: 12px 20px;
+  font-size: 16px;
+  background: black;
+  color: var(--neon-pink);
+  border: 2px solid var(--neon-pink);
+  cursor: pointer;
+  box-shadow: 0 0 15px var(--neon-pink);
+  transition: 0.2s;
+}
+
+button:hover {
+  background: var(--neon-pink);
+  color: black;
+  box-shadow: 0 0 30px var(--neon-pink);
+}
+
+.alarm {
+  animation: alarmFlash 0.3s infinite;
+}
+
+@keyframes alarmFlash {
+  0% { box-shadow: 0 0 20px red; }
+  50% { box-shadow: 0 0 50px red; }
+  100% { box-shadow: 0 0 20px red; }
+}
 </style>
 </head>
-<body class="scanlines">
-<div class="chrome"></div>
-<div class="wrap">
-    <h1>CYBERPUNK EGG TIMER</h1>
 
-    <div class="display" id="display">03:00</div>
+<body>
+<div class="container" id="container">
+  <h1>🥚 CYBER EGG</h1>
 
-    <div class="inputs">
-        <div class="field">
-            <label for="minutes">Minutter</label>
-            <input type="number" id="minutes" min="0" value="3">
-        </div>
-        <div class="field">
-            <label for="seconds">Sekunder</label>
-            <input type="number" id="seconds" min="0" max="59" value="0">
-        </div>
-    </div>
+  <div>
+    <input type="number" id="minutes" placeholder="Min" min="0">
+    <input type="number" id="seconds" placeholder="Sek" min="0" max="59">
+  </div>
 
-    <div class="buttons">
-        <button class="btn" id="startBtn">Start</button>
-        <button class="btn secondary" id="pauseBtn" disabled>Pausér</button>
-        <button class="btn warn" id="resetBtn" disabled>Nullstill</button>
-    </div>
+  <div class="timer" id="display">00:00</div>
 
-    <div class="progress" aria-label="Fremdrift">
-        <div class="bar" id="bar"></div>
-    </div>
+  <button onclick="startTimer()">START</button>
+  <button onclick="resetTimer()">RESET</button>
+</div>
 
-    <div class="hint" id="hint">Tips: La siden spille av lyd én gang (trykk Start) for å gi nettleseren lov til alarm.</div>
+<script>
+let interval;
+let remaining;
+let audioCtx;
+let alarmOsc;
 
-    <!-- Innebygd alarmlyd (kort sirene, WAV PCM) -->
-    <audio id="alarm" preload="auto">
-        <source id="alarmSrc" type="audio/wav"
-            src="data:audio/wav;base64,UklGRl4bAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABYAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-            AAAAAAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAB8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fH////wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAAAAA>
-(() => {
-    "use strict";
+function startTimer() {
+  const min = parseInt(document.getElementById("minutes").value) || 0;
+  const sec = parseInt(document.getElementById("seconds").value) || 0;
+  remaining = min * 60 + sec;
 
-    const display = document.getElementById("display");
-    const minutesEl = document.getElementById("minutes");
-    const secondsEl = document.getElementById("seconds");
-    const bar = document.getElementById("bar");
+  if (remaining <= 0) return;
 
-    const startBtn = document.getElementById("startBtn");
-    const pauseBtn = document.getElementById("pauseBtn");
-    const resetBtn = document.getElementById("resetBtn");
+  updateDisplay();
+  clearInterval(interval);
 
-    const alarmEl = document.getElementById("alarm");
+  interval = setInterval(() => {
+    remaining--;
+    updateDisplay();
 
-    let totalMs = 0;
-    let remainingMs = 0;
-    let timerId = null;
-    let startedAt = 0;
-    let paused = false;
-    let vibrateId = null;
-
-    function clamp(val, min, max){ return Math.max(min, Math.min(max, val)); }
-
-    function fmt(ms){
-        const s = Math.max(0, Math.floor(ms/1000));
-        const m = Math.floor(s/60);
-        const ss = String(s%60).padStart(2, "0");
-        return `${String(m).padStart(2,"0")}:${ss}`;
+    if (remaining <= 0) {
+      clearInterval(interval);
+      triggerAlarm();
     }
+  }, 1000);
+}
 
-    function setProgress(){
-        if (totalMs <= 0) {
-            bar.style.width = "0%";
-            return;
-        }
-        const done = clamp((totalMs - remainingMs)/totalMs, 0, 1);
-        bar.style.width = (done*100).toFixed(2) + "%";
-    }
+function resetTimer() {
+  clearInterval(interval);
+  stopAlarm();
+  document.getElementById("display").textContent = "00:00";
+}
 
-    function uiRunning(running){
-        startBtn.disabled = running;
-        pauseBtn.disabled = !running;
-        resetBtn.disabled = !running;
-        minutesEl.disabled = running;
-        secondsEl.disabled = running;
-    }
+function updateDisplay() {
+  const m = String(Math.floor(remaining / 60)).padStart(2, "0");
+  const s = String(remaining % 60).padStart(2, "0");
+  document.getElementById("display").textContent = `${m}:${s}`;
+}
 
-    function getInputMs(){
-        const m = parseInt(minutesEl.value, 10) || 0;
-        const s = parseInt(secondsEl.value, 10) || 0;
-        minutesEl.value = clamp(m, 0, 600);
-        secondsEl.value = clamp(s, 0, 59);
-        return (m*60 + s) * 1000;
-    }
+function triggerAlarm() {
+  document.getElementById("container").classList.add("alarm");
 
-    function tick(){
-        const now = performance.now();
-        remainingMs = Math.max(0, totalMs - (now - startedAt));
-        display.textContent = fmt(remainingMs);
-        setProgress();
-        if (remainingMs <= 0){
-            stopTimer();
-            triggerAlarm();
-        }
-    }
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  alarmOsc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
 
-    function startTimer(){
-        // Hvis paused, fortsett; ellers ny start
-        if (!paused){
-            totalMs = getInputMs();
-            if (totalMs <= 0){
-                pulseHint("Velg et tidsrom først.");
-                return;
-            }
-            remainingMs = totalMs;
-            startedAt = performance.now();
-        } else {
-            // fortsett fra pause
-            startedAt = performance.now() - (totalMs - remainingMs);
-        }
-        paused = false;
+  alarmOsc.type = "sawtooth";
+  alarmOsc.frequency.setValueAtTime(880, audioCtx.currentTime);
+  gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
 
-        uiRunning(true);
-        document.body.classList.remove("alarm-flash");
+  alarmOsc.connect(gain);
+  gain.connect(audioCtx.destination);
 
-        clearInterval(timerId);
-        timerId = setInterval(tick, 100);
-        tick();
-        primeAudio();
-    }
+  alarmOsc.start();
 
-    function pauseTimer(){
-        if (!timerId) return;
-        clearInterval(timerId);
-        timerId = null;
-        paused = true;
-        uiRunning(false);
-        // behold feltene låst, men la start være mulig
-        minutesEl.disabled = true;
-        secondsEl.disabled = true;
-        startBtn.disabled = false;
-        pauseBtn.disabled = true;
-        resetBtn.disabled = false;
-    }
+  // pulserende sirene
+  setInterval(() => {
+    alarmOsc.frequency.setValueAtTime(
+      alarmOsc.frequency.value === 880 ? 440 : 880,
+      audioCtx.currentTime
+    );
+  }, 300);
+}
 
-    function stopTimer(){
-        if (timerId) clearInterval(timerId);
-        timerId = null;
-        paused = false;
-        uiRunning(false);
-    }
-
-    function resetTimer(){
-        stopTimer();
-        totalMs = getInputMs();
-        remainingMs = totalMs;
-        display.textContent = fmt(remainingMs || 0);
-        setProgress();
-        document.body.classList.remove("alarm-flash");
-        stopVibration();
-        safeStopAudio();
-    }
-
-    function pulseHint(text){
-        const h = document.getElementById("hint");
-        if (text) h.textContent = text;
-        h.style.transition = "none";
-        h.style.opacity = "1";
-        requestAnimationFrame(()=> {
-            h.style.transition = "opacity .6s ease";
-            h.style.opacity = ".7";
-        });
-    }
-
-    async function primeAudio(){
-        // Kall play() tidlig for å gi tillatelse; catch ved autoplay-policy
-        try {
-            alarmEl.volume = 1.0;
-            // pause umiddelbart etter for å cache dekoder
-            await alarmEl.play();
-            alarmEl.pause();
-            alarmEl.currentTime = 0;
-        } catch(e){
-            // Ikke kritisk; vi prøver igjen ved alarm
-        }
-    }
-
-    function safeStopAudio(){
-        try { alarmEl.pause(); alarmEl.currentTime = 0; } catch(e){}
-    }
-
-    function vibrate(pattern){
-        if (navigator.vibrate){
-            navigator.vibrate(pattern);
-        }
-    }
-    function stopVibration(){
-        vibrate(0);
-        if (vibrateId) { clearInterval(vibrateId); vibrateId = null; }
-    }
-
-    async function triggerAlarm(){
-        document.body.classList.add("alarm-flash");
-
-        // Kraftig vibrasjon (mønster), repeter i noen sekunder
-        stopVibration();
-        const vibPattern = [400, 200, 400, 200, 800, 300, 800];
-        vibrate(vibPattern);
-        vibrateId = setInterval(()=> vibrate(vibPattern), 3500);
-
-        // Spill innebygd lyd; fallback til Web Audio sirene hvis blokkert
-        try{
-            alarmEl.currentTime = 0;
-            await alarmEl.play();
-        } catch(e){
-            webAudioFallback();
-        }
-
-        // Vis melding
-        setTimeout(() => {
-            try { alert("Tiden er ute – egg ferdig!"); } catch(_) {}
-        }, 50);
-    }
-
-    function webAudioFallback(){
-        // Synth-sirene med Web Audio API
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "square";
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        let t = ctx.currentTime;
-        const dur = 3.5;
-
-        // Sweep mellom to frekvenser for sireneeffekt
-        osc.frequency.setValueAtTime(520, t);
-        osc.frequency.linearRampToValueAtTime(880, t + 0.45);
-        osc.frequency.linearRampToValueAtTime(520, t + 0.90);
-        osc.frequency.linearRampToValueAtTime(880, t + 1.35);
-        osc.frequency.linearRampToValueAtTime(520, t + 1.80);
-        osc.frequency.linearRampToValueAtTime(880, t + 2.25);
-        osc.frequency.linearRampToValueAtTime(520, t + 2.70);
-
-        gain.gain.setValueAtTime(0.001, t);
-        gain.gain.exponentialRampToValueAtTime(0.6, t + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
-
-        osc.start(t);
-        osc.stop(t + dur);
-    }
-
-    // Event Listeners
-    startBtn.addEventListener("click", startTimer);
-    pauseBtn.addEventListener("click", pauseTimer);
-    resetBtn.addEventListener("click", resetTimer);
-
-    // Init
-    resetTimer();
-})();
+function stopAlarm() {
+  document.getElementById("container").classList.remove("alarm");
+  if (alarmOsc) alarmOsc.stop();
+  if (audioCtx) audioCtx.close();
+}
 </script>
 </body>
 </html>
-
